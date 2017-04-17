@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-transform-modern-regexp",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "description": "Enables modern RegExp features in JavaScript",
   "repository": "DmitrySoshnikov/babel-plugin-transform-modern-regexp",
@@ -29,6 +29,9 @@
     "jest-cli": "^19.0.2"
   },
   "jest": {
-    "testPathIgnorePatterns": ["/node_modules/", "fixtures"]
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "fixtures"
+    ]
   }
 }
