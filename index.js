@@ -81,7 +81,7 @@ module.exports = ({types: t}) => {
         if (node.arguments[0].type === 'StringLiteral') {
           origPattern = node.arguments[0].value;
         } else if (node.arguments[0].type === 'TemplateLiteral') {
-          origPattern = node.arguments[0].quasis[0].value.raw;
+          origPattern = node.arguments[0].quasis[0].value.cooked;
         }
 
         let origFlags = '';
@@ -90,7 +90,7 @@ module.exports = ({types: t}) => {
           if (node.arguments[1].type === 'StringLiteral') {
             origFlags = node.arguments[1].value;
           } else if (node.arguments[1].type === 'TemplateLiteral') {
-            origFlags = node.arguments[1].quasis[0].value.raw;
+            origFlags = node.arguments[1].quasis[0].value.cooked;
           }
         }
 
