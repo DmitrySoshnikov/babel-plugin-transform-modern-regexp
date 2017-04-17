@@ -27,7 +27,7 @@ See also examples in [compat-transpile](https://www.npmjs.com/package/regexp-tre
 
 ### dotAll s-flag
 
-By default the `.` symbol matchs all symbols _but_ new lines. The "dotAll" `s` flag enables matching `\n` with the `.` symbol:
+By default the `.` symbol matches all symbols _but_ new lines. The "dotAll" `s` flag enables matching `\n` with the `.` symbol:
 
 ```js
 // Simple.
