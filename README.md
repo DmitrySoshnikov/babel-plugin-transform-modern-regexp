@@ -89,9 +89,9 @@ new RegExp(`
 
   # A regular expression for date.
 
-  (?<year>\d{4})-    # year part of a date
-  (?<month>\d{2})-   # month part of a date
-  (?<day>\d{2})      # day part of a date
+  (?<year>\\d{4})-    # year part of a date
+  (?<month>\\d{2})-   # month part of a date
+  (?<day>\\d{2})      # day part of a date
 
 `, 'x');
 ```
@@ -116,7 +116,7 @@ This option enables usage of a supporting runtime for the transformed regexes. T
 
 > NOTE: `regexp-tree-runtime` should be in your dependencies list.
 
-E.g. the date expression is translated into:
+E.g. the [date expression](#extended-x-flag) from above is translated into:
 
 ```js
 const RegExpTree = require('regexp-tree-runtime');
