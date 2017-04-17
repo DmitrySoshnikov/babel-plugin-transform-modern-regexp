@@ -11,9 +11,9 @@ const plugin = require('..');
 
 const {transformFileSync} = require('babel-core');
 
-describe('modern-regexp-test', () => {
-  const fixturesDir = path.join(__dirname, 'fixtures');
+const fixturesDir = path.join(__dirname, 'fixtures');
 
+describe('modern-regexp-test', () => {
   fs.readdirSync(fixturesDir).map(caseName => {
     it(caseName, () => {
       const fixtureDir = path.join(fixturesDir, caseName);
@@ -31,5 +31,26 @@ describe('modern-regexp-test', () => {
 
       expect(actual.trim()).toBe(expected.trim());
     });
+  });
+
+  it('specific features', () => {
+    const inputPath = path.join(fixturesDir, 'integration', 'input.js');
+
+    const actual = transformFileSync(inputPath, {
+      'plugins': [
+        [plugin, {
+          features: [
+            'namedCapturingGroups',
+            'xFlag',
+          ],
+        }]
+      ]
+    }).code;
+
+    const expected = fs.readFileSync(
+      path.join(fixturesDir, 'integration', 'expected-subset.js')
+    ).toString();
+
+    expect(actual.trim()).toBe(expected.trim());
   });
 });

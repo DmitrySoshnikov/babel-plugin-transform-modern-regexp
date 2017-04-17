@@ -1,0 +1,1 @@
+const re = new RegExp('(.)+\\1', 'su');

@@ -1,6 +1,6 @@
 # babel-plugin-transform-modern-regexp
 
-[![Build Status](https://travis-ci.org/DmitrySoshnikov/babel-plugin-transform-modern-regexp.svg?branch=master)](https://travis-ci.org/DmitrySoshnikov/babel-plugin-transform-modern-regexp) [![npm version](https://badge.fury.io/js/babel-plugin-transform-modern-regexp.svg)](https://badge.fury.io/js/babel-plugin-transform-modern-regexp) [![npm downloads](https://img.shields.io/npm/dt/babel-plugin-transform-modern-regexp.svg)](https://www.npmjs.com/package/babel-plugin-transform-modern-regexp)
+[![Build Status](https://travis-ci.org/DmitrySoshnikov/babel-plugin-transform-modern-regexp.svg?branch=master)](https://travis-ci.org/DmitrySoshnikov/babel-plugin-transform-modern-regexp) [![npm version](https://badge.fury.io/js/babel-plugin-transform-modern-regexp.svg)](https://badge.fury.io/js/babel-plugin-transform-modern-regexp)
 
 Enables modern RegExp features in JavaScript.
 
@@ -10,6 +10,9 @@ Enables modern RegExp features in JavaScript.
   - [dotAll s-flag](#dotall-s-flag)
   - [Named capturing groups](#named-capturing-groups)
   - [Extended x-flag](#extended-x-flag)
+- [Plugin options](#plugin-options)
+  - [`includeRuntime` option](#includeruntime-option)
+  - [`features` option](#features-option)
 - [Usage](#usage)
   - [Via `.babelrc`](#via-babelrc)
   - [Via CLI](#via-cli)
@@ -97,6 +100,67 @@ Translated into:
 new RegExp('(\\d{4})-(\\d{2})-(\\d{2})', '');
 ```
 
+## Plugin options
+
+The plugin supports the following options.
+
+### `includeRuntime` option
+
+> NOTE: the `includeRuntime` option is not implemented yet. Track [issue #3](https://github.com/DmitrySoshnikov/babel-plugin-transform-modern-regexp/issues/3) for details.
+
+> NOTE: `includeRuntime` is not required: if e.g. named groups are used mostly for readability, the `includeRuntime` can be omitted. If you need to access actual group names on the matched results, the runtime support should be used.
+
+This option enables usage of a supporting runtime for the transformed regexes. The `RegExpTree` class is a thin wrapper on top of a native regexp, and has identical API.
+
+> NOTE: `regexp-tree-runtime` should be in your dependencies list.
+
+E.g. the date expression is translated into:
+
+```js
+const RegExpTree = require('regexp-tree-runtime');
+
+...
+
+const re = new RegExpTree(/(\d{4})-(\d{2})-(\d{2})/, {
+  flags: 'x',
+  source: <original-source>,
+  groups: {
+    year: 1,
+    month: 2,
+    day: 3,
+  },
+});
+
+const result = re.exec('2017-04-17');
+
+// Can access `result.groups`:
+
+console.log(result.groups.year); // 2017
+```
+
+### `features` option
+
+This options allows choosing which specific transformations to apply. Available features are:
+
+- `dotAll`
+- `namedCapturingGroups`
+- `xFlag`
+
+which can be specified as an extra object for the plugin:
+
+```json
+{
+  "plugins": ["transform-modern-regexp", {
+    features: [
+      'namedCapturingGroups',
+      'xFlag'
+    ]
+  }]
+}
+```
+
+> NOTE: if omitted, all features are used by default.
+
 ## Usage
 
 ### Via `.babelrc`
@@ -119,6 +183,6 @@ $ babel --plugins transform-modern-regexp script.js
 
 ```js
 require('babel-core').transform(code, {
-  'plugins': ['transform-modern-regexp']
+  plugins: ['transform-modern-regexp']
 });
 ```

@@ -58,7 +58,7 @@ const regexpTree = require('regexp-tree');
 module.exports = ({types: t}) => {
   return {
     pre(state) {
-      if (state.includeRuntime) {
+      if (state.opts.includeRuntime) {
         throw new Error(`includeRuntime is not implemented yet.`);
       }
     },
@@ -66,12 +66,12 @@ module.exports = ({types: t}) => {
     visitor: {
 
       // Handle `/foo/i`.
-      RegExpLiteral({node}) {
-        Object.assign(node, getTranslatedData(node.extra.raw));
+      RegExpLiteral({node}, state) {
+        Object.assign(node, getTranslatedData(node.extra.raw, state));
       },
 
       // Handle `new RegExp('foo', 'i')`.
-      NewExpression({node}) {
+      NewExpression({node}, state) {
         if (!isNewRegExp(node)) {
           return;
         }
@@ -94,8 +94,8 @@ module.exports = ({types: t}) => {
           }
         }
 
-        const origRe = '/' + origPattern + '/' + origFlags;
-        const {pattern, flags} = getTranslatedData(origRe);
+        const origRe = `/${origPattern}/${origFlags}`;
+        const {pattern, flags} = getTranslatedData(origRe, state);
 
         node.arguments[0] = t.stringLiteral(pattern);
         node.arguments[1] = t.stringLiteral(flags);
@@ -105,8 +105,14 @@ module.exports = ({types: t}) => {
 };
 
 // Returns transalted pattern, and flags.
-function getTranslatedData(regexp) {
-  const compat = regexpTree.compatTranspile(regexp);
+function getTranslatedData(regexp, state) {
+  let whitelist = undefined;
+
+  if (Array.isArray(state.opts.features) && state.opts.features.length > 0) {
+    whitelist = state.opts.features;
+  }
+
+  const compat = regexpTree.compatTranspile(regexp, whitelist);
 
   return {
     pattern: compat.getSource(),
