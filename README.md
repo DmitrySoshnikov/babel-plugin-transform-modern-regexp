@@ -1,5 +1,7 @@
 # babel-plugin-transform-modern-regexp
 
+[![Build Status](https://travis-ci.org/DmitrySoshnikov/babel-plugin-transform-modern-regexp.svg?branch=master)](https://travis-ci.org/DmitrySoshnikov/babel-plugin-transform-modern-regexp) [![npm version](https://badge.fury.io/js/babel-plugin-transform-modern-regexp.svg)](https://badge.fury.io/js/babel-plugin-transform-modern-regexp) [![npm downloads](https://img.shields.io/npm/dt/babel-plugin-transform-modern-regexp.svg)](https://www.npmjs.com/package/babel-plugin-transform-modern-regexp)
+
 Enables modern RegExp features in JavaScript.
 
 ### Table of Contents
