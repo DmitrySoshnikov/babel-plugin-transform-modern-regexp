@@ -26,13 +26,13 @@ The plugin enables the following features for JS regular expressions:
 * Named capturing groups (stage 3 proposal)
 * Extended `x`-flag (non-standard)
 
-See also examples in [compat-transpile](https://www.npmjs.com/package/regexp-tree#using-compat-transpiler-api), and [regexp extensions](https://www.npmjs.com/package/regexp-tree#regexp-extensions) secions of [regexp-tree](https://www.npmjs.com/package/regexp-tree).
+See also examples in [compat-transpile](https://www.npmjs.com/package/regexp-tree#using-compat-transpiler-api), and [regexp extensions](https://www.npmjs.com/package/regexp-tree#regexp-extensions) sections of [regexp-tree](https://www.npmjs.com/package/regexp-tree).
 
 ### dotAll s-flag
 
 See details in the [proposal](https://github.com/mathiasbynens/es-regexp-dotall-flag).
 
-By default the `.` symbol matchs all symbols _but_ new lines. The "dotAll" `s` flag enables matching `\n` and other new line symbols with the `.` symbol:
+By default the `.` symbol matches all symbols _but_ new lines. The "dotAll" `s` flag enables matching `\n` and other new line symbols with the `.` symbol:
 
 ```js
 // Simple.
@@ -72,7 +72,7 @@ To backreference a named group, we can use `\k<name>` notation:
 /(?<value>a)\k<value>\1/
 ```
 
-The above regexp is transalted into:
+The above regexp is translated into:
 
 ```js
 /(a)\1\1/
@@ -82,7 +82,7 @@ The above regexp is transalted into:
 
 > Note: `x`-flag is not yet standardized by ES spec. It's a standard flag in PCRE, Python, and other regexes.
 
-Some features, like `x`-flag currently can only be used via `new RegExp(...)` pattern, since are not suppored yet by JavaScript parsers for regexp literals:
+Some features, like `x`-flag currently can only be used via `new RegExp(...)` pattern, since are not supported yet by JavaScript parsers for regexp literals:
 
 ```js
 new RegExp(`
