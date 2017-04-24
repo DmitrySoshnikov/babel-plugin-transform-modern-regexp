@@ -1,1 +1,1 @@
-const re = new RegExp('([\\0-\\u{10FFFF}])+\\1\\1', 'u');
+const re = /([\0-\u{10FFFF}])+\1\1/u;

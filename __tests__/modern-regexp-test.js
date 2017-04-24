@@ -19,9 +19,17 @@ describe('modern-regexp-test', () => {
       const fixtureDir = path.join(fixturesDir, caseName);
       const inputPath = path.join(fixtureDir, 'input.js');
 
+      let options = {};
+
+      const optionsFile = path.join(fixtureDir, 'options.json');
+
+      if (fs.existsSync(optionsFile)) {
+        options = require(optionsFile);
+      }
+
       const actual = transformFileSync(inputPath, {
         'plugins': [
-          plugin
+          [plugin, options]
         ]
       }).code;
 

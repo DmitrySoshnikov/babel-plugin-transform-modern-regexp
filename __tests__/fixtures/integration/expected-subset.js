@@ -1,1 +1,1 @@
-const re = new RegExp('(.)+\\1\\1', 'su');
+const re = /(.)+\1\1/su;

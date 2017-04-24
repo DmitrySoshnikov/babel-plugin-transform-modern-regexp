@@ -11,8 +11,9 @@ Enables modern RegExp features in JavaScript.
   - [Named capturing groups](#named-capturing-groups)
   - [Extended x-flag](#extended-x-flag)
 - [Plugin options](#plugin-options)
-  - [`includeRuntime` option](#includeruntime-option)
   - [`features` option](#features-option)
+  - [`useRe` option](#usere-option)
+  - [`useRuntime` option](#useruntime-option)
 - [Usage](#usage)
   - [Via `.babelrc`](#via-babelrc)
   - [Via CLI](#via-cli)
@@ -99,18 +100,85 @@ new RegExp(`
 Translated into:
 
 ```js
-new RegExp('(\\d{4})-(\\d{2})-(\\d{2})', '');
+/(\d{4})-(\d{2})-(\d{2})/;
 ```
 
 ## Plugin options
 
 The plugin supports the following options.
 
-### `includeRuntime` option
+### `features` option
 
-> NOTE: the `includeRuntime` option is not implemented yet. Track [issue #3](https://github.com/DmitrySoshnikov/babel-plugin-transform-modern-regexp/issues/3) for details.
+This options allows choosing which specific transformations to apply. Available features are:
 
-> NOTE: `includeRuntime` is not required: if e.g. named groups are used mostly for readability, the `includeRuntime` can be omitted. If you need to access actual group names on the matched results, the runtime support should be used.
+- `dotAll`
+- `namedCapturingGroups`
+- `xFlag`
+
+which can be specified as an extra object for the plugin:
+
+```json
+{
+  "plugins": ["transform-modern-regexp", {
+    "features": [
+      "namedCapturingGroups",
+      "xFlag"
+    ]
+  }]
+}
+```
+
+> NOTE: if omitted, all features are used by default.
+
+### `useRe` option
+
+This option enables a convenient `re` shorthand, which allows using multiline regexes with _single escape for meta-characters_ (just like in regular expression literals).
+
+Taking example of the date regexep using standard `RegExp` constructor:
+
+```js
+new RegExp(`
+
+  # A regular expression for date.
+
+  (?<year>\\d{4})-    # year part of a date
+  (?<month>\\d{2})-   # month part of a date
+  (?<day>\\d{2})      # day part of a date
+
+`, 'x');
+```
+
+we see inconvenient double-escaping of `\\d` (and similarly for other meta-characters). The `re` shorthand allows using single escaping:
+
+```js
+re`/
+
+  # A regular expression for date.
+
+  (?<year>\d{4})-    # year part of a date
+  (?<month>\d{2})-   # month part of a date
+  (?<day>\d{2})      # day part of a date
+
+/x`;
+```
+
+As we can see, `re` accepts a regexp in the _literal notation_, which unifies the usage format.
+
+In both cases it's translated to simple regexp literal, so no any runtime overhead:
+
+```js
+/(\d{4})-(\d{2})-(\d{2})/
+```
+
+> NOTE: it supports only template string literals, you can't use expressions there. Be careful also with `/${4}/` -- this is treated as a template literal expression, and should be written as `/\${4}/` instead.
+
+> NOTE: `\\1` backreferences should still be escaped with _double slashes_. This is due template literal strings do not allow `\1` treating them as Octal numbers.
+
+### `useRuntime` option
+
+> NOTE: the `useRuntime` option is not implemented yet. Track [issue #3](https://github.com/DmitrySoshnikov/babel-plugin-transform-modern-regexp/issues/3) for details.
+
+> NOTE: `useRuntime` is not required: if e.g. named groups are used mostly for readability, the `useRuntime` can be omitted. If you need to access actual group names on the matched results, the runtime support should be used.
 
 This option enables usage of a supporting runtime for the transformed regexes. The `RegExpTree` class is a thin wrapper on top of a native regexp, and has identical API.
 
@@ -139,29 +207,6 @@ const result = re.exec('2017-04-17');
 
 console.log(result.groups.year); // 2017
 ```
-
-### `features` option
-
-This options allows choosing which specific transformations to apply. Available features are:
-
-- `dotAll`
-- `namedCapturingGroups`
-- `xFlag`
-
-which can be specified as an extra object for the plugin:
-
-```json
-{
-  "plugins": ["transform-modern-regexp", {
-    "features": [
-      "namedCapturingGroups",
-      "xFlag"
-    ]
-  }]
-}
-```
-
-> NOTE: if omitted, all features are used by default.
 
 ## Usage
 

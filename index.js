@@ -29,7 +29,20 @@ const regexpTree = require('regexp-tree');
  *
  *   /(\d{4})-(\d{2})-(\d{2})/
  *
- * Note: if `includeRuntime` option is passed, this is transalted into:
+ * ------------------------------------------------------------------
+ *   1. The `features` option.
+ *
+ * The `features` option allows specifying specific regexp features
+ * to be applied. Available are:
+ *
+ *   - `dotAll` - enables handling of `s` flag
+ *   - namedCapturingGroups - enables handling of named groups
+ *   - xFlag - enables handling of `x` flag
+ *
+ * ------------------------------------------------------------------
+ *   2. The `useRuntime` option.
+ *
+ * Note: if `useRuntime` option is passed, this is transalted into:
  *
  *   const RegExpTree = require('regexp-tree-runtime');
  *
@@ -52,53 +65,129 @@ const regexpTree = require('regexp-tree');
  * In case of using runtime, it should be included as a dependency in your
  * package.json.
  *
- * If group names are used mostly for readability, `includeRuntime` may be
+ * If group names are used mostly for readability, `useRuntime` may be
  * omitted.
+ *
+ * ------------------------------------------------------------------
+ *   3. The `re` shorthand (`useRe` option)
+ *
+ * The `useRe` option, enables usage of the re`...` pattern. This handles
+ * global `re` function, where regular expressions can be used with
+ * single escaping.
+ *
+ * Using simple `RegExp` (note double escape `\\d` as per JS strings):
+ *
+ *   new RegExp(`
+ *
+ *     (?<year>\\d{2})-
+ *     (?<month>\\d{2})-
+ *     (?<day>\\d{2})
+ *
+ *   `, 'x');
+ *
+ * vs. using `re` (not single escape for `\d`):
+ *
+ *   re`/
+ *
+ *     (?<year>\d{2})-
+ *     (?<month>\d{2})-
+ *     (?<day>\d{2})
+ *
+ *   /x`
  */
 module.exports = ({types: t}) => {
+
+  /**
+   * Creates a `RegExpLiteral` node.
+   */
+  function toRegExpLiteral(raw) {
+    const slashIndex = raw.lastIndexOf('/');
+
+    const pattern = raw.slice(1, slashIndex);
+    const flags = raw.slice(slashIndex);
+
+    const re = t.regExpLiteral(
+      pattern,
+      flags,
+    );
+
+    re.extra = {
+      raw,
+    };
+
+    return re;
+  }
+
   return {
     pre(state) {
-      if (state.opts.includeRuntime) {
-        throw new Error(`includeRuntime is not implemented yet.`);
+      if (state.opts.useRuntime) {
+        throw new Error(`useRuntime is not implemented yet.`);
       }
     },
 
     visitor: {
 
-      // Handle `/foo/i`.
+      /**
+       * Handle `/foo/i`.
+       */
       RegExpLiteral({node}, state) {
         Object.assign(node, getTranslatedData(node.extra.raw, state));
       },
 
-      // Handle `new RegExp('foo', 'i')`.
-      NewExpression({node}, state) {
+      /**
+       * Handle re`/<body>/<flags>` pattern.
+       * Translate to `/doubleEscape(<body>)/<flags>`
+       */
+      TaggedTemplateExpression(path, state) {
+        const {node} = path;
+
+        if (!state.opts.useRe || !isReTemplate(node)) {
+          return;
+        }
+
+        let re = node.quasi.quasis[0].value.raw;
+
+        // Handle \\\\1 -> \\1. In templates \\1 should be used instead of
+        // \1 since \1 is treated as an octal number, which is not allowed
+        // in template strings.
+        re = re.replace(/\\\\(\d+)/g, '\\$1');
+
+        path.replaceWith(toRegExpLiteral(re));
+      },
+
+      /**
+       * Handle `new RegExp(<body>, <flags>)`.
+       *
+       * Translate to /<body>/<flags>
+       */
+      NewExpression(path, state) {
+        const {node} = path;
+
         if (!isNewRegExp(node)) {
           return;
         }
 
-        let origPattern;
+        let pattern;
 
         if (node.arguments[0].type === 'StringLiteral') {
-          origPattern = node.arguments[0].value;
+          pattern = node.arguments[0].value;
         } else if (node.arguments[0].type === 'TemplateLiteral') {
-          origPattern = node.arguments[0].quasis[0].value.cooked;
+          pattern = node.arguments[0].quasis[0].value.cooked;
         }
 
-        let origFlags = '';
+        let flags = '';
 
         if (node.arguments[1]) {
           if (node.arguments[1].type === 'StringLiteral') {
-            origFlags = node.arguments[1].value;
+            flags = node.arguments[1].value;
           } else if (node.arguments[1].type === 'TemplateLiteral') {
-            origFlags = node.arguments[1].quasis[0].value.cooked;
+            flags = node.arguments[1].quasis[0].value.cooked;
           }
         }
 
-        const origRe = `/${origPattern}/${origFlags}`;
-        const {pattern, flags} = getTranslatedData(origRe, state);
+        const re = `/${pattern}/${flags}`;
 
-        node.arguments[0] = t.stringLiteral(pattern);
-        node.arguments[1] = t.stringLiteral(flags);
+        path.replaceWith(toRegExpLiteral(re));
       }
     },
   };
@@ -136,4 +225,13 @@ function isNewRegExp(node) {
        node.arguments[0].quasis.length === 1)
     )
   );
+}
+
+function isReTemplate(node) {
+  return (
+    node.tag.type === 'Identifier' &&
+    node.tag.name === 're' &&
+    node.quasi.type === 'TemplateLiteral' &&
+    node.quasi.quasis.length === 1
+  )
 }
