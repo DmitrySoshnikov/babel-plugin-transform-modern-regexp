@@ -4,6 +4,8 @@
 
 Enables modern RegExp features in JavaScript.
 
+You can get an overview of the plugin in [this article](https://medium.com/@DmitrySoshnikov/using-modern-regexes-in-javascript-30322af557c5).
+
 ### Table of Contents
 
 - [Features](#features)
