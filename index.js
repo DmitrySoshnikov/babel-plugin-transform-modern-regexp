@@ -108,7 +108,7 @@ module.exports = ({types: t}) => {
 
     const re = t.regExpLiteral(
       pattern,
-      flags,
+      flags
     );
 
     re.extra = {
