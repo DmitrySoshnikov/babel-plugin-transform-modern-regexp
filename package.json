@@ -22,10 +22,10 @@
     "node": ">=6"
   },
   "dependencies": {
-    "regexp-tree": "^0.0.43"
+    "regexp-tree": "^0.0.85"
   },
   "devDependencies": {
-    "babel-core": "6.24.1",
+    "babel-core": "^6.26.3",
     "jest-cli": "^19.0.2"
   },
   "jest": {
