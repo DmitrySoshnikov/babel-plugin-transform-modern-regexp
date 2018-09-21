@@ -121,12 +121,14 @@ which can be specified as an extra object for the plugin:
 
 ```json
 {
-  "plugins": ["transform-modern-regexp", {
-    "features": [
-      "namedCapturingGroups",
-      "xFlag"
-    ]
-  }]
+  "plugins": [
+    ["transform-modern-regexp", {
+      "features": [
+        "namedCapturingGroups",
+        "xFlag"
+      ]
+    }]
+  ]
 }
 ```
 
