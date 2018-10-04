@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const plugin = require('..');
 
-const {transformFileSync} = require('babel-core');
+const {transformFileSync} = require('@babel/core');
 
 const fixturesDir = path.join(__dirname, 'fixtures');
 
