@@ -233,7 +233,7 @@ $ babel --plugins transform-modern-regexp script.js
 ### Via Node.js API
 
 ```js
-require('babel-core').transform(code, {
+require('@babel/core').transform(code, {
   plugins: ['transform-modern-regexp']
 });
 ```
